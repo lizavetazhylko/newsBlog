@@ -1,0 +1,11 @@
+.button-primary {
+    background-color: blue;
+}
+
+.button-secondary {
+    background-color: grey;
+}
+
+.button:hover {
+    cursor: pointer;
+}

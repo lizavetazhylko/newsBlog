@@ -1,0 +1,21 @@
+.sign-up-title {
+    margin-left: 30%;
+    margin-bottom: 40px;
+}
+
+.sign-up-form {
+    width: 32%;
+    margin: 0 auto;
+    padding: 20px;
+    border: 2px solid lightgray;
+}
+
+.sign-up-button {
+    width: 100%;
+    border-radius: 0;
+}
+
+.no-accaunt-text {
+    display: flex;
+    justify-content: center;
+}

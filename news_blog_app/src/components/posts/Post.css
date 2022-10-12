@@ -1,0 +1,11 @@
+.dark-post-text {
+    color: white;
+}
+
+.light-post-text {
+    color: black;
+}
+
+.post-wrapper:hover {
+    cursor: pointer;
+}
