@@ -1,0 +1,15 @@
+.articles {
+    width: 70%;
+    margin: 0 auto 30px;
+
+    &-search {
+        width: 100%;
+        margin: 0;
+        display: flex;
+        justify-content: space-between;
+        
+        &-item {
+            width: 30%;
+        }
+    }
+}

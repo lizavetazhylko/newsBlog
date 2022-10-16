@@ -1,64 +1,95 @@
-import React, { useState } from "react";
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
-import { Link } from "react-router-dom";
-import './SignUp.css'
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { StoreState } from "../../types";
-import { signup } from "../../redux/action_creators";
-/*email: "cesigip615@vasqa.com"
-id: 548
-username: "DASDWDADDWAWDWAD"*/    
+import { Link } from "react-router-dom";
+import { MIN_PWD_LENGTH } from "../../constants";
+import { useInput } from "../../hooks";
+import { signup, userAuthorize } from "../../redux/action_creators";
+import { StoreState } from "../../redux/storeTypes";
+import './SignUp.css';
 
 const SignUp = () => {
     const dispatch = useDispatch();
-    const theme = useSelector((state: StoreState) => state.theme.theme)
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmpassword, setConfirmPassword] = useState('')
-    const handleInputChange = (e: any, setter: Function) => {
-        setter(e.target.value)
-    }
-    const onSignUp = () => {
-        dispatch(signup({
-            username: name,
-            email,
-            password
-        }))
-    }
-    return (
-        <div>
-            <div className="sign-up-title">
-                <Link to='/posts'>Back to home</Link >
-                <h1>Sign In</h1>
-            </div>
-            <Form className="sign-up-form">
-                <Form.Group className="mb-3" controlId="formBasicEmail">
-                    <Form.Label>Name</Form.Label>
-                    <Form.Control placeholder="Enter name" onChange={(e) => handleInputChange(e, setName)} value={name}/>
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="formBasicEmail">
-                    <Form.Label>Email</Form.Label>
-                    <Form.Control type="email" placeholder="Enter email" onChange={(e) => handleInputChange(e, setEmail)} value={email}/>
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="formBasicPassword">
-                    <Form.Label>Password</Form.Label>
-                    <Form.Control type="password" placeholder="Password" onChange={(e) => handleInputChange(e, setPassword)} value={password}/>
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="formBasicPassword">
-                    <Form.Label>Confirm password</Form.Label>
-                    <Form.Control type="password" placeholder="Confirm password" onChange={(e) => handleInputChange(e, setConfirmPassword)} value={confirmpassword}/>
-                </Form.Group>
-                <Button variant="primary" className="sign-up-button" onClick={onSignUp}>
-                    SignUP
-                </Button>
-                <Form.Text className="text-muted no-accaunt-text">
-                    <span>Already have an account?<a href="#">Sing In</a></span>
-                </Form.Text>
-            </Form>
-        </div>
-    )
-}
 
-export default SignUp
+    useEffect(() => {
+        localStorage.clear();
+        dispatch(userAuthorize(null));
+    }, []);
+
+    const username = useInput('username', '', {'isEmpty': true});
+    const email = useInput('email', '', {'isEmpty': true, 'isEmail': true});
+    const password = useInput('password', '', {'isEmpty': true, 'minLengthErr': MIN_PWD_LENGTH});
+    const confirmPassword = useInput('confirmPassword', '', {'isEmpty': true, 'confirmPwd': password.value});
+
+    const onSignUp = () => {
+        if (confirmPassword.value === password.value) {
+            dispatch(signup({
+                username: username.value,
+                email: email.value,
+                password: password.value,
+            }));
+        }
+    };
+
+    const signUpErrors = useSelector((state: StoreState) => state.errors.signUpErrors);
+    const createTokenUserErrors = useSelector((state: StoreState) => state.errors.createTokenUserErrors)
+    const userErrors: string[] = [];
+
+    if (signUpErrors !== undefined && createTokenUserErrors !== undefined) {
+        signUpErrors.concat(createTokenUserErrors).map(err => userErrors.push(err));
+    }
+
+    return (
+        <div className="sign-up-container">
+            <h2 className="sign-up-container-title">Sign Up</h2>
+            <div>
+                { 
+                    userErrors.length > 0 && 
+                    userErrors.map((err, index) => <div key={index} style={{color: 'red'}}>{err}</div>)
+                }            
+            </div>
+            <div className="sign-up-block">
+                <div className="sign-up-block-content">
+                    <label> 
+                        Username
+                        <input onChange={(e) => username.onChange(e)}  name="username" className="sign-up-block-el" type="text" placeholder="Username" value={username.value}></input>
+                        {username.valid && <div style={{color: 'red'}}>{username.valid}</div>}
+                    </label>
+                </div>
+                <div className="sign-up-block-content">
+                    <label>
+                        Email
+                        <input onChange={(e) => email.onChange(e)} name="email" className="sign-up-block-el" type="email" placeholder="Email" value={email.value}></input>
+                        {email.valid && <div style={{color: 'red'}}>{email.valid}</div>}
+                    </label>
+                </div>
+                <div className="sign-up-block-content">
+                    <label>
+                        Password
+                        <input onChange={(e) => password.onChange(e)} name="password" className="sign-up-block-el" type="password" placeholder="Password" value={password.value}></input>
+                        {password.valid && <div style={{color: 'red'}}>{password.valid}</div>}
+                    </label>
+                </div>
+                <div className="sign-up-block-content">
+                    <label>
+                        Confirm Password
+                        <input onChange={(e) => confirmPassword.onChange(e)} name="confirm-password" className="sign-up-block-el" type="password" placeholder="Confirm password" value={confirmPassword.value}></input>
+                        {confirmPassword.valid && <div style={{color: 'red'}}>{confirmPassword.valid}</div>}
+                    </label>
+                </div>   
+                <button className="sign-up-block-btn-sign-up" 
+                        disabled={
+                            !!username.valid || !!email.valid || !!password.valid || !!confirmPassword.valid
+                            || password.value === confirmPassword.value
+                        }
+                        onClick={onSignUp}>
+                    Sign Up
+                </button>
+                <div>
+                    <span>Already have an account?<Link to="/signin">Sing In</Link></span>
+                </div>              
+            </div>
+        </div>
+    );
+};
+
+export { SignUp };

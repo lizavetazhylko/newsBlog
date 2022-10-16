@@ -1,59 +1,67 @@
-import React, { useState, useRef } from 'react';
-import { Form, Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { MIN_PWD_LENGTH } from "../../constants";
+import { useInput } from "../../hooks";
+import { signin, userAuthorize } from "../../redux/action_creators";
+import { StoreState } from "../../redux/storeTypes";
 import './SignIn.css';
-import { StoreState } from '../../types';
-import { authorize, signin } from '../../redux/action_creators';
-import { useNavigate} from 'react-router-dom';
 
 const SignIn = () => {
-    const theme = useSelector((state: StoreState) => state.theme.theme)
-    const navigate = useNavigate();
     const dispatch = useDispatch();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('')
-    const emailRef = useRef() as React.MutableRefObject<HTMLInputElement>;
-    const passRef = useRef() as React.MutableRefObject<HTMLInputElement>;
-    const handleEmailChange = (e: any) => {
-        setEmail(e.target.value)
+
+    useEffect(() => {
+        localStorage.clear();
+        dispatch(userAuthorize(null));
+    }, []);
+    
+    const email = useInput('email', '', {'isEmpty': true, 'isEmail': true});
+    const password = useInput('password', '', {'isEmpty': true, 'minLengthErr': MIN_PWD_LENGTH});
+     
+    const onSignClick = () => {
+        dispatch(signin({email: email.value, password: password.value}));
+    }    
+
+    const signUpErrors = useSelector((state: StoreState) => state.errors.signUpErrors);
+    const createTokenUserErrors = useSelector((state: StoreState) => state.errors.createTokenUserErrors)
+    const userErrors: string[] = [];
+
+    if (signUpErrors !== undefined && createTokenUserErrors !== undefined) {
+        signUpErrors.concat(createTokenUserErrors).map(err => userErrors.push(err));
     }
-    const handlePasswordChange = (e: any) => {
-        setPassword(e.target.value)
-    }
-    const onSignIn = (e: any) => {
-        if (email === '') {
-            emailRef.current.focus();
-        } else if (password === '') {
-            passRef.current.focus();
-        }
-        console.log(email, password)
-        dispatch(signin({ email, password }, navigate))
-        // dispatch(authorize());
-        // window.history.back()
-        //navigate('/posts/new')
-    }
+
     return (
-        <div>
-            <h2 className={`${theme}-title`}>Sign In</h2>
-            <div className={`sign-in-form ${theme}-sign-in-form`}>
-                <Form.Group className="mb-3" controlId="formBasicEmail">
-                    <Form.Label>Email</Form.Label>
-                    <Form.Control ref={emailRef} type="email" placeholder="Enter email" onChange={handleEmailChange}/>
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="formBasicPassword">
-                    <Form.Label>Password</Form.Label>
-                    <Form.Control ref={passRef} type="password" placeholder="Password" onChange={handlePasswordChange}/>
-                    <Form.Text className="text-muted">
-                        <Link to='/forgotpass'>Forgot password?</Link>
-                    </Form.Text>
-                </Form.Group>
-                <Button variant="primary" type="submit" className="sign-in-button" onClick={onSignIn}>
-                    Submit
-                </Button>
-                <Form.Text className="text-muted no-account-text">
-                        <span>Don't have a account?<Link to='/signup'>Sign up</Link></span>
-                </Form.Text>
+        <div className="sign-in-container">
+            <h2 className="sign-in-container-title">Sign In</h2>
+            <div>
+                { 
+                    userErrors.length > 0 && 
+                    userErrors.map((err, index) => <div key={index} style={{color: 'red'}}>{err}</div>)
+                }            
+            </div>
+            <div className="sign-in-block">
+                <div className="sign-in-block-content">
+                    <label>
+                        Email
+                        <input onChange={(e) => email.onChange(e)} name="email" className="sign-in-block-el" type="email" placeholder="Email" value={email.value}></input>
+                        {email.valid && <div style={{color: 'red'}}>{email.valid}</div>}
+                    </label>
+                </div>
+                <div className="sign-in-block-content">
+                    <label>
+                        Password
+                        <input onChange={(e) => password.onChange(e)} name="password" className="sign-in-block-el" type="password" placeholder="Password" value={password.value}></input>
+                        {password.valid && <div style={{color: 'red'}}>{password.valid}</div>}
+                    </label>
+                </div>  
+                <button className="sign-in-block-btn-sign-in" 
+                        disabled={!!email.valid || !!password.valid}
+                        onClick={onSignClick}>
+                    Sign In
+                </button>
+                <div>
+                    <span>Don't have an account?<Link to="/signup">Sing Up</Link></span>
+                </div> 
             </div>
         </div>
     )

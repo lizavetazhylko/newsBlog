@@ -1,0 +1,14 @@
+.username {
+    display: flex;
+    justify-content: space-around;
+    width: 14%;
+    height: 60px;
+    color: #fff;
+    align-items: center;
+    background-color: #3a3aeb;
+}
+
+.username-fio {
+    padding: 5px 15px;
+    background-color: #468fc7;
+}

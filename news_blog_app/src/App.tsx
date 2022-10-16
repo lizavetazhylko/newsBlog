@@ -1,68 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { Button } from 'react-bootstrap';
-import { WrapperRef } from './components/hooks/useRef/Wrapper';
-import { Posts } from './components/posts/Posts';
-import { ThemeContext } from './contexts';
-import { Themes } from './constants';
-import './App.css';
-import { SignIn } from './components/signin/SignIn';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { StoreState, ThemeState } from './types';
-import { getUser, toggleTheme } from './redux/action_creators';
-import SignUp from './components/signup/SignUp';
+import React, { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import { Activation } from './components/activation/Activation';
+import { Article } from './components/arcticles/Article';
+import { Articles } from './components/arcticles/Articles';
 import { Header } from './components/header/Header';
-import { AddPost } from './components/posts/AddPost';
+import { SignIn } from './components/signin/SignIn';
+import { SignUp } from './components/signup/SignUp';
+import { getUser } from './redux/action_creators';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-const App = () => {
+function App() {
   const dispatch = useDispatch();
-  const theme = useSelector((state: StoreState) => state.theme.theme)
-  const currentUser = useSelector((state: StoreState) => state.user.user)
-
-  const isAuthorized = !!localStorage.getItem('jwtAccess');
-  
-  const handleChangeTheme = () => {
-      dispatch(toggleTheme());
-  }
   useEffect(() => {
     const token = localStorage.getItem('jwtAccess');
+    console.log('app token =', token);
     if (token) {
-      dispatch(getUser())
+      dispatch(getUser());
     } else {
       const { pathname } = window.location;
-      if (pathname !== '/signin' && pathname !== '/posts')
-      window.location.href = '/signin'
+      if (pathname !== '/signin' && pathname !== '/signup') {
+        window.location.href = '/signin';
+      }
     }
-  }, [localStorage.getItem('jwtAccess')])
+  }, [localStorage.getItem('jwtAccess')]);
+
   return (
-      <div className={theme+'-app-container'}>
-          <Header currentUser={currentUser}>
-            <Button onClick={handleChangeTheme}>Change theme</Button>
-          </Header>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/">
-                <Route index element={<div>Home</div>} />
-                <Route path="posts">
-                  <Route index element={<Posts isAuthorized={isAuthorized}/>} />
-                  <Route path=":id" element={<div>Selected post</div>} />
-                  <Route path="new">
-                    <Route index element={<AddPost />} />
-                  </Route>
-                </Route>
-                <Route path="signin" element={<SignIn />} />
-                <Route path="signup" element={<SignUp />} />
-                <Route path="activate">
-                  <Route path="*" element={<Activation />} />
-                </Route>
-                <Route path="forgotpass" element={<div>Forgot password</div>} />
-              </Route>
-              <Route path="*" element={<div>Not found</div>} />
-            </Routes>
-          </BrowserRouter>
-      </div>
+    <div className="App">
+      <Header />
+      <BrowserRouter>
+        <Routes>
+          <Route path='/'>
+            <Route index element = {
+              <div>
+                  <h1>home page</h1>
+                  <nav>
+                    <Link to='/'>Home</Link>
+                    <Link to='signup'>SignUp</Link>
+                    <Link to='signin'>SignIn</Link>
+                  </nav>
+              </div>} 
+            />
+            <Route path='signin' element={<SignIn />} />
+            <Route path='signup' element={<SignUp />} />
+            <Route path='activate'>
+               <Route path='*' element={<Activation />}  />
+            </Route>
+            <Route path='articles/' element={<Articles/>} />           
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </div>
   );
 }
 
