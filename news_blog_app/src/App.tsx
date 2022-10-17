@@ -2,19 +2,19 @@ import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import { Activation } from './components/activation/Activation';
-import { Article } from './components/arcticles/Article';
 import { Articles } from './components/arcticles/Articles';
 import { Header } from './components/header/Header';
 import { SignIn } from './components/signin/SignIn';
 import { SignUp } from './components/signup/SignUp';
 import { getUser } from './redux/action_creators';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { Menu } from './components/menu/Menu';
+import { Blogs } from './components/blogs/Blogs';
 
 function App() {
   const dispatch = useDispatch();
   useEffect(() => {
     const token = localStorage.getItem('jwtAccess');
-    console.log('app token =', token);
     if (token) {
       dispatch(getUser());
     } else {
@@ -28,6 +28,7 @@ function App() {
   return (
     <div className="App">
       <Header />
+      <Menu />
       <BrowserRouter>
         <Routes>
           <Route path='/'>
@@ -46,7 +47,8 @@ function App() {
             <Route path='activate'>
                <Route path='*' element={<Activation />}  />
             </Route>
-            <Route path='articles/' element={<Articles/>} />           
+            <Route path='articles/' element={<Articles />} />
+            <Route path='blogs/' element={<Blogs />} />         
           </Route>
         </Routes>
       </BrowserRouter>

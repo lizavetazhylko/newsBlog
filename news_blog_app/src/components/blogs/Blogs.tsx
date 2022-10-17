@@ -3,24 +3,24 @@ import debounce from "lodash.debounce";
 import { Accordion, Form, Row } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { StoreState } from "../../redux/storeTypes";
+import { Blog } from "./Blog";
+import { BlogPagination } from "./BlogPagination";
+import { SortMode, SORT_BLOGS_RULES } from "../../constants";
 import { 
-    loadArticles, 
+    loadBlogs, 
     setCurrentPage, 
     setSortMode, 
     setStart, 
     setTextContains, 
     setTitleContains 
-} from "../../redux/action_creators/article_action_creators";
-import { Article } from "./Article";
-import { ArticlePagination } from "./ArticlePagination";
-import { SortMode, SORT_ARTICLES_RULES } from "../../constants";
-import "./Articles.css";
+} from "../../redux/action_creators/blog_action_creators";
+import "./Blogs.css";
 
-const Articles = () => {
+const Blogs = () => {
     const dispatch = useDispatch();
     const [title_contains, setSearchTitle] = useState('');
     const [summary_contains, setSearchContent] = useState('');
-    const [_sort, setSort] = useState(SORT_ARTICLES_RULES[1]);
+    const [_sort, setSort] = useState(SORT_BLOGS_RULES[1]);
     const [sortMode, setSortModeChecked] = useState(SortMode.ASC);
 
     const handleSearchChange = (e: any, setSearch: Function) => {
@@ -41,15 +41,15 @@ const Articles = () => {
 
     const debounceOnChange = debounce(handleSearchChange, 500);
 
-    const { _start, _limit } = useSelector((state: StoreState) => state.articles.searchInfo);
-    const { totalCount, currentPage } = useSelector((state: StoreState) => state.articles);
+    const { _start, _limit } = useSelector((state: StoreState) => state.blogs.searchInfo);
+    const { totalCount, currentPage } = useSelector((state: StoreState) => state.blogs);
 
     useEffect(() => {
         dispatch(setTitleContains(title_contains));
         dispatch(setTextContains(summary_contains));
         dispatch(setSortMode(sortMode));
         dispatch(
-            loadArticles({
+            loadBlogs({
                 _start,
                 _limit,
                 _sort,
@@ -59,17 +59,17 @@ const Articles = () => {
         );
     }, [title_contains, summary_contains, _start, _sort, sortMode])
    
-    const articles = useSelector((state: StoreState) => state.articles.articles);
+    const blogs = useSelector((state: StoreState) => state.blogs.blogs);
 
     return (
-        <div className="articles">
-            <h2>Articles</h2>
+        <div className="blogs">
+            <h2>Blogs</h2>
             <Accordion defaultActiveKey="0" style={{marginBottom: '30px'}}>
                 <Accordion.Item eventKey="0">
                     <Accordion.Header>Search params</Accordion.Header>
                     <Accordion.Body>
-                        <div className="articles-search">
-                            <Form.Group className="articles-search-item" controlId="formBasicSearchTitle">
+                        <div className="blogs-search">
+                            <Form.Group className="blogs-search-item" controlId="formBasicSearchTitle">
                                 <Form.Label>Search by title</Form.Label>
                                 <Form.Control 
                                     style={{width: '100%'}} 
@@ -78,7 +78,7 @@ const Articles = () => {
                                     onChange={(e) => debounceOnChange(e, setSearchTitle)} 
                                 />
                             </Form.Group>
-                            <Form.Group className="articles-search-item" controlId="formBasicSearchContent">
+                            <Form.Group className="blogs-search-item" controlId="formBasicSearchContent">
                                 <Form.Label>Search by content</Form.Label>
                                 <Form.Control 
                                     style={{width: '100%'}} 
@@ -87,27 +87,27 @@ const Articles = () => {
                                     onChange={(e) => debounceOnChange(e, setSearchContent)} 
                                 />
                             </Form.Group>
-                            <Form.Group className="articles-search-item" controlId="formBasicSort">
+                            <Form.Group className="blogs-search-item" controlId="formBasicSort">
                                 <Form.Label>Order by</Form.Label>
                                 <Form.Select aria-label="Default select example"
                                     onChange={handleSortChange}
                                     value={_sort}
                                 >
                                     {
-                                        SORT_ARTICLES_RULES.map(sort => (
+                                        SORT_BLOGS_RULES.map(sort => (
                                             <option value={sort} key={sort}>{sort}</option>
                                         ))
                                     }
                                 </Form.Select>
                             </Form.Group>
-                            <Form.Group className="articles-search-item" controlId="formBasicSortMode">
+                            <Form.Group className="blogs-search-item" controlId="formBasicSortMode">
                                 <Form.Label>Order by mode</Form.Label>
                                 <div>
                                     <Form.Check
                                         inline
                                         defaultChecked = {sortMode === SortMode.ASC}                            
                                         label={`Order by ${SortMode.ASC}`}
-                                        name="sort-articles-mode"
+                                        name="sort-blogs-mode"
                                         type={'radio'}
                                         id={`sort-mode-${'type'}-1`}
                                         onChange={handleSortModeChange}
@@ -117,7 +117,7 @@ const Articles = () => {
                                         inline
                                         defaultChecked = {sortMode === SortMode.DESC}  
                                         label={`Order by ${SortMode.DESC}`}
-                                        name="sort-articles-mode"
+                                        name="sort-blogs-mode"
                                         type={'radio'}
                                         id={`sort-mode-${'radio'}-2`}
                                         onChange={handleSortModeChange}
@@ -130,19 +130,19 @@ const Articles = () => {
                 </Accordion.Item>
             </Accordion>                
             {
-                articles.length > 0 ?
+                blogs.length > 0 ?
                 <>
                     <Row xs={1} md={3} className="g-3">
                     {    
-                        articles.map(article => {
-                            const { id, imageUrl, title, summary, url, publishedAt } = article;
+                        blogs.map(blog => {
+                            const { id, imageUrl, title, summary, url, publishedAt } = blog;
                             return (
-                                <Article article={{ id, imageUrl, title, summary, url, publishedAt }} key={id} />
+                                <Blog blog={{ id, imageUrl, title, summary, url, publishedAt }} key={id} />
                             )
                         })                  
                     }
                     </Row>
-                    <ArticlePagination totalCount={totalCount} currentPage={currentPage} />                
+                    <BlogPagination totalCount={totalCount} currentPage={currentPage} />                
                 </>
                 :
                 <h1>NO DATA FOUND</h1>
@@ -151,4 +151,4 @@ const Articles = () => {
     )
 };
 
-export { Articles };
+export { Blogs };

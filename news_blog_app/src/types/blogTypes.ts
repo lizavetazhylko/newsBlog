@@ -2,7 +2,7 @@ import { SortMode } from "../constants/vars"
 import { Events } from "./eventTypes"
 import { Launches } from "./launchesTypes"
 
-type ArticleInfo = {
+type BlogInfo = {
     id: number,
     featured: boolean,
     title: string,
@@ -15,7 +15,7 @@ type ArticleInfo = {
     events: Events[],
 }
 
-type ArticleVisualInfo = {
+type BlogVisualInfo = {
     id: number,
     title: string,
     url: string,
@@ -24,20 +24,20 @@ type ArticleVisualInfo = {
     publishedAt: string, 
 }
 
-type ArticleVisual = {
-    article: ArticleVisualInfo,
+type BlogVisual = {
+    blog: BlogVisualInfo,
     key: number,
 }
 
-type ArticlesState = {
-    articles: ArticleInfo[],
-    searchInfo: SearchArticlesInfo,
+type BlogsState = {
+    blogs: BlogInfo[],
+    searchInfo: SearchBlogsInfo,
     totalCount: number,
     currentPage: number,
     sortMode: SortMode,
 }
 
-type SearchArticlesInfo = {
+type SearchBlogsInfo = {
     _start: number,
     _limit: number,
     _sort: string,
@@ -45,9 +45,9 @@ type SearchArticlesInfo = {
     summary_contains: string,
 }
 
-type PaginationArticleInfo = {
+type PaginationBlogInfo = {
     totalCount: number,
     currentPage: number,
 }
 
-export type { ArticleInfo, ArticlesState, SearchArticlesInfo, ArticleVisualInfo, ArticleVisual, PaginationArticleInfo };
+export type { BlogInfo, BlogsState, SearchBlogsInfo, BlogVisualInfo, BlogVisual, PaginationBlogInfo };

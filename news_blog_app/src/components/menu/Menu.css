@@ -1,0 +1,40 @@
+.menu {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 60px;
+    left: 0;
+    transform: translateX(-114%);
+    transition: all 0.2s;
+    z-index: 50;
+
+    &-blur {
+        width: 100%;
+        height: 100vh;
+        left: 14%;
+        backdrop-filter: blur(2px);
+        position: absolute;        
+    }
+
+    &-items {
+        background-color: #34d1a4;
+        width: 14%;
+    }
+
+    &-item {
+        height: 50px;
+    }
+
+    &-list {
+        list-style-type: none;
+        display: flex;
+        padding: 0 5px;
+        flex-direction: column;
+        align-items: center;
+        font-size: 25px;
+    }
+}
+
+.menu.open {
+    transform: translateX(0);
+}
